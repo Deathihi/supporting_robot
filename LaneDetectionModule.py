@@ -1,9 +1,42 @@
 import cv2
 import numpy as np
 import utilities
+from MotorModule import Motor
+import numpy as np
 
 curveList = []
 avgVal=10
+
+#################################################
+motor = Motor(24,23,4,17,23,22)
+##################################################
+
+def getImg(display= False,size=[480,240]):
+    _, img = cap.read()
+    cv2.waitKey(1)
+    img = cv2.resize(img,(size[0],size[1]))
+
+    return img
+
+
+def main():
+
+    img = getImg(display=True)
+    cv2.waitKey(2)
+    curveVal= getLaneCurve(img,2)
+
+    sen = 1.3  # SENSITIVITY
+    maxVAl= 0.3 # MAX SPEED
+    if curveVal>maxVAl:curveVal = maxVAl
+    if curveVal<-maxVAl: curveVal =-maxVAl
+    #print(curveVal)
+    if curveVal>0:
+        sen =1.7
+        if curveVal<0.05: curveVal=0
+    else:
+        if curveVal>-0.08: curveVal=0
+    motor.move(0.20,-curveVal*sen,0.05)
+    #cv2.waitKey(1)
 
 def getLaneCurve(img,display=2):
 
@@ -62,14 +95,22 @@ def getLaneCurve(img,display=2):
     return curve
 
 
+
 if __name__ == '__main__':
      cap = cv2.VideoCapture(0)
      intialTracbarVals = [110,101,43,240]
      utilities.initializeTrackbars(intialTracbarVals)
      while True:
+         img = getImg()
          success, img = cap.read()
          img = cv2.resize(img,(480,240))
          curve = getLaneCurve(img,display=2)
          print(curve)
          #cv2.imshow('vid',img)
          cv2.waitKey(1)
+         main()
+         if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+            
+cap.release()
+cv2.destroyAllWindows()
