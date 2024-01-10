@@ -56,5 +56,5 @@ def main():
     motor.stop(2)
 
 if __name__ == '__main__':
-    motor= Motor(24,23,4,17,22,27)
+    motor= Motor(2,3,4,17,22,27)
     main()
